@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:storeapp/screens/dashboard.dart';
+import 'package:storeapp/screens/inventory.dart';
+import 'package:storeapp/screens/reviews.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -11,10 +13,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  var pages = [
+  List<StatelessWidget> pages = [
     Dashboard(),
-    Center(child: Text('Reviews')),
-    Center(child: Text('Inventory')),
+    Reviews(),
+    Inventory()
   ];
 
   int _selectedIndex = 0;
