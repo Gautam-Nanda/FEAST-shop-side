@@ -165,19 +165,39 @@ class Dashboard extends StatelessWidget {
           ),
           SizedBox(height: 24),
           Image.asset("assets/chart.png"),
-          SizedBox(height: 24),
           Padding(
             padding: const EdgeInsets.only(left: 16.0),
-            child: Text(
-              "Pending Orders",
-              style: GoogleFonts.spaceGrotesk(
-                  color: Colors.black,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold),
+            child: Row(
+              children: [
+                Text(
+                  "Orders",
+                  style: GoogleFonts.spaceGrotesk(
+                      color: Colors.black,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold),
+                ),
+                Spacer(),
+                Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/allorders');
+                    },
+                    child: Text(
+                      "View All",
+                      style: GoogleFonts.spaceGrotesk(
+                          color: Colors.orange,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  
+                ),
+              ],
             ),
           ),
           SizedBox(height: 16),
-          OrderContainer(),
+          Padding(child: OrderContainer(), padding: EdgeInsets.only(left:32)),
           SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.only(left: 16.0),
@@ -188,7 +208,7 @@ class Dashboard extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16),
-          OrderContainer(),
+          Padding(child: OrderContainer(), padding: EdgeInsets.only(left:32)),
           SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.only(left: 16.0),
@@ -199,7 +219,7 @@ class Dashboard extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16),
-          OrderContainer(),
+          Padding(child: OrderContainer(), padding: EdgeInsets.only(left:32)),
           SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.only(left: 16.0),
@@ -209,7 +229,115 @@ class Dashboard extends StatelessWidget {
               color: Color.fromARGB(255, 206, 201, 201),
             ),
           ),
-          Padding(padding: EdgeInsets.only(bottom:16))
+          SizedBox(height: 24,),
+          Text(
+            "Raw Material Offers",
+            style: GoogleFonts.spaceGrotesk(
+                color: Colors.black,
+                fontSize: 24,
+                fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 8),
+          // tabbed view, one for recieved and one for sent raw material offers
+          DefaultTabController(
+            length: 2,
+            child: Column(
+              children: [
+                TabBar(
+                  labelColor: Colors.orange,
+                  unselectedLabelColor: Colors.grey,
+                  indicatorColor: Colors.orange,
+                  tabs: [
+                    Tab(
+                      text: "Recieved",
+                    ),
+                    Tab(
+                      text: "Sent",
+                    ),
+                  ],
+                ),
+                Container(
+                  height: 200,
+                  child: TabBarView(
+                    children: [
+                      // recieved
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: 3,
+                        itemBuilder: (BuildContext context, int index) {
+                          return ListTile(
+                            title: Text("Raw Material Name"),
+                            subtitle: Text("Rs. 400"),
+                            trailing: ElevatedButton(
+                              onPressed: () {
+                                // open a bottom sheet with the outlet details
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Container(
+                                      height: 200,
+                                      child: Column(
+                                        children: [
+                                          Text("Raw Material Name"),
+                                          Text("Quantity"),
+                                          Text("Price"),
+                                          Text("Outlet Name"),
+                                          Text("Address"),
+                                          Text("Phone Number"),
+                                          Text("Email"),
+                                        ]
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              child: Text("View"),
+                            ),
+                          );
+                        },
+                      ),
+                      // sent
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: 3,
+                        itemBuilder: (BuildContext context, int index) {
+                          return ListTile(
+                            title: Text("Raw Material Name"),
+                            subtitle: Text("Rs. 400"),
+                            trailing: ElevatedButton(
+                              onPressed: () {
+                                // open a bottom sheet with the outlet details
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Container(
+                                      height: 200,
+                                      child: Column(
+                                        children: [
+                                          Text("Raw Material Name"),
+                                          Text("Quantity"),
+                                          Text("Price"),
+                                          Text("Outlet Name"),
+                                          Text("Address"),
+                                          Text("Phone Number"),
+                                          Text("Email"),
+                                        ]
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              child: Text("View"),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          )
         ]),
       ),
     );
@@ -221,9 +349,7 @@ class OrderContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(left:32),
-        child: Row(
+    return Row(
       children: [
         Column(
           children: [
@@ -240,8 +366,10 @@ class OrderContainer extends StatelessWidget {
             Text("2:30 pm", style: GoogleFonts.spaceGrotesk(color: Colors.green, fontWeight: FontWeight.bold),),
           ],
         ),
+        SizedBox(width: 32),
+        Text("PENDING", style: GoogleFonts.spaceGrotesk(color: Colors.yellow[700], fontWeight: FontWeight.bold),),
       ],
-    ));
+    );
   }
 }
 

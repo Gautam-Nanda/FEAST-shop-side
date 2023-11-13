@@ -13,7 +13,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<StatelessWidget> pages = [
+  List<Widget> pages = [
     Dashboard(),
     Reviews(),
     Inventory()
