@@ -1,7 +1,32 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart';
 
-class Reviews extends StatelessWidget {
+class Reviews extends StatefulWidget {
+  @override
+  State<Reviews> createState() => _ReviewsState();
+}
+
+class _ReviewsState extends State<Reviews> {
+  List reviews = [];
+
+  void fetchReviews() async {
+    const url = 'http://10.0.2.2:8000/reviews/1';
+    final response = await get(Uri.parse(url));
+    setState(() {
+      reviews = jsonDecode(response.body);
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchReviews();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -29,11 +54,12 @@ class Reviews extends StatelessWidget {
             ],
           ),
           SizedBox(height: 24),
-          Reviewcard(),
-          SizedBox(height: 24),
-          Reviewcard(),
-          SizedBox(height:24),
-          Reviewcard()
+          if (reviews.length == 0)
+            Center(
+              child: CircularProgressIndicator(),
+            )
+          else
+            for (var review in reviews) Reviewcard(comment: review['comment'], reviewer: review['reviewer']['name'], rating: review['rating'], date: review['created_at'], itemName: review['reviewed_item']['name'])
         ]),
       ),
     );
@@ -42,83 +68,103 @@ class Reviews extends StatelessWidget {
 
 
 class Reviewcard extends StatelessWidget {
-  const Reviewcard({super.key});
+  final String comment;
+  final String reviewer;
+  final int rating;
+  final String date;
+  final String itemName;
+  const Reviewcard({super.key, required this.comment, required this.reviewer, required this.rating, required this.date, required this.itemName});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 400,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 2,
-            blurRadius: 4,
-            offset: Offset(0, 2), // changes position of shadow
+    return Column(
+      children: [
+        Container(
+          width: 400,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                spreadRadius: 2,
+                blurRadius: 4,
+                offset: Offset(0, 2), // changes position of shadow
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            Row(
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // profile pic
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.orange,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "A",
+                Row(
+                  children: [
+                    // profile pic
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: Text(
+                          reviewer[0],
+                          style: GoogleFonts.spaceGrotesk(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    // reviewer name
+                    Text(
+                      reviewer,
                       style: GoogleFonts.spaceGrotesk(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontSize: 24,
                           fontWeight: FontWeight.bold),
                     ),
-                  ),
-                ),
-                SizedBox(width: 16),
-                // reviewer name
-                Text(
-                  "Amanda",
-                  style: GoogleFonts.spaceGrotesk(
-                      color: Colors.black,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold),
-                ),
-                Spacer(),
-                // star rating
-                Row(
-                  children: [
-                    Icon(Icons.star, color: Colors.orange),
-                    Icon(Icons.star, color: Colors.orange),
-                    Icon(Icons.star, color: Colors.orange),
-                    Icon(Icons.star, color: Colors.orange),
-                    Icon(Icons.star, color: Colors.grey[400]),
+                    Spacer(),
+                    // star rating
+                    Row(
+                      children: [
+                        for (var i = 0; i < rating; i++)
+                          Icon(
+                            Icons.star,
+                            color: Colors.orange,
+                            size: 18,
+                          ),
+                        for (var i = 0; i < 5 - rating; i++)
+                          Icon(
+                            Icons.star,
+                            color: Colors.grey,
+                            size: 18,
+                          ),
+                      ]
+                    )
                   ]
-                )
-              ]
+                ),
+                // the review text
+                SizedBox(height: 16),
+              Text(comment, style: GoogleFonts.spaceGrotesk()),
+              SizedBox(height: 8,),
+              Row(
+                children: [
+                  Spacer(),
+                  Text(itemName+", ", style: GoogleFonts.spaceGrotesk(color: Colors.grey)),
+                  // date formatted
+                  Text(date.substring(0, 10), style: GoogleFonts.spaceGrotesk(color: Colors.grey)),
+                ],
+              )
+              ],
             ),
-            // the review text
-            SizedBox(height: 16),
-          Text("Pretty good i don't know what to say lol lorem ipsum dolor why did i not copy paste this nevermind wahtever 4/5 stars", style: GoogleFonts.spaceGrotesk()),
-          SizedBox(height: 8,),
-          Row(
-            children: [
-              Spacer(),
-              Text("17th August 2023 3:32 PM", style: GoogleFonts.spaceGrotesk(color: Colors.grey))
-            ],
           )
-          ],
         ),
-      )
+        SizedBox(height: 24),
+      ],
     );
   }
 }

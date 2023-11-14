@@ -1,7 +1,34 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart';
 
-class Dashboard extends StatelessWidget {
+class Dashboard extends StatefulWidget {
+  @override
+  State<Dashboard> createState() => _DashboardState();
+}
+
+class _DashboardState extends State<Dashboard> {
+  late Map<dynamic,dynamic> revenueStats = {
+    "daily": "Loading",
+    "weekly": "Loading",
+    "monthly": "Loading"
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    const String url = "http://10.0.2.2:8000/store/1/revenue-stats";
+    get(Uri.parse(url)).then((Response response) {
+      setState(() {
+        revenueStats = jsonDecode(response.body);
+      });
+    });
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -58,8 +85,13 @@ class Dashboard extends StatelessWidget {
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold),
                               ),
-                              Text(
-                                "30,000",
+                              revenueStats['daily'] == "Loading" ? Padding(
+                                padding: const EdgeInsets.only(left: 16.0),
+                                child: CircularProgressIndicator(
+                                  color: Colors.green,
+                                ),
+                              ) :Text(
+                                revenueStats['daily'].toString(),
                                 style: GoogleFonts.spaceGrotesk(
                                     color: Colors.green,
                                     fontSize: 28,
@@ -87,7 +119,7 @@ class Dashboard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Today's Revenue",
+                            "Weekly Revenue",
                             style: GoogleFonts.spaceGrotesk(
                                 color: Colors.black,
                                 fontSize: 16,
@@ -102,8 +134,13 @@ class Dashboard extends StatelessWidget {
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold),
                               ),
-                              Text(
-                                "30,000",
+                              revenueStats['weekly'] == "Loading" ? Padding(
+                                padding: const EdgeInsets.only(left: 16.0),
+                                child: CircularProgressIndicator(
+                                  color: Colors.green,
+                                ),
+                              ) :Text(
+                                revenueStats['weekly'].toString(),
                                 style: GoogleFonts.spaceGrotesk(
                                     color: Colors.green,
                                     fontSize: 28,
@@ -131,7 +168,7 @@ class Dashboard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Today's Revenue",
+                            "Monthly Revenue",
                             style: GoogleFonts.spaceGrotesk(
                                 color: Colors.black,
                                 fontSize: 16,
@@ -146,8 +183,13 @@ class Dashboard extends StatelessWidget {
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold),
                               ),
-                              Text(
-                                "30,000",
+                              revenueStats['monthly'] == "Loading" ? Padding(
+                                padding: const EdgeInsets.only(left: 16.0),
+                                child: CircularProgressIndicator(
+                                  color: Colors.green,
+                                ),
+                              ) :Text(
+                                revenueStats['monthly'].toString(),
                                 style: GoogleFonts.spaceGrotesk(
                                     color: Colors.green,
                                     fontSize: 28,
@@ -205,28 +247,6 @@ class Dashboard extends StatelessWidget {
               height: 1,
               width: MediaQuery.of(context).size.width - 64,
               color: const Color.fromARGB(255, 206, 201, 201),
-            ),
-          ),
-          SizedBox(height: 16),
-          Padding(child: OrderContainer(), padding: EdgeInsets.only(left:32)),
-          SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0),
-            child: Container(
-              height: 1,
-              width: MediaQuery.of(context).size.width - 64,
-              color: Color.fromARGB(255, 206, 201, 201),
-            ),
-          ),
-          SizedBox(height: 16),
-          Padding(child: OrderContainer(), padding: EdgeInsets.only(left:32)),
-          SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0),
-            child: Container(
-              height: 1,
-              width: MediaQuery.of(context).size.width - 64,
-              color: Color.fromARGB(255, 206, 201, 201),
             ),
           ),
           SizedBox(height: 24,),
