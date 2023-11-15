@@ -340,28 +340,45 @@ class _DashboardState extends State<Dashboard> {
                             title: Text("Raw Material Name"),
                             subtitle: Text("Rs. 400"),
                             trailing: ElevatedButton(
+                              child: Text("View"),
                               onPressed: () {
                                 // open a bottom sheet with the outlet details
                                 showModalBottomSheet(
                                   context: context,
                                   builder: (BuildContext context) {
-                                    return Container(
-                                      height: 200,
-                                      child: Column(children: [
-                                        Text("Raw Material Name"),
-                                        Text("Quantity"),
-                                        Text("Price"),
-                                        Text("Outlet Name"),
-                                        Text("Address"),
-                                        Text("Phone Number"),
-                                        Text("Email"),
-                                      ]),
-                                    );
+                                    return Card(
+                                        child: Container(
+
+                                          height: 200,
+                                          child: ListTile(
+                                            contentPadding: EdgeInsets.all(32),
+                                            title: Text(
+                                              "Raw Material Name",
+                                              style: GoogleFonts.spaceGrotesk(
+                                                  color: Colors.black,
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            subtitle: Text(
+                                                "Outlet Name\nAddress\nPhone Number\nEmail",
+                                                style: GoogleFonts.spaceGrotesk(
+                                                  color: Colors.black,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.normal)),
+                                            trailing: Text("Price",
+                                            style: GoogleFonts.spaceGrotesk(
+                                                  color: Colors.orangeAccent,
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.bold)),
+                                            isThreeLine: true,
+                                          ),
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(11)));
                                   },
                                 );
-                              },
-                              child: Text("View"),
-                            ),
+                        })
                           );
                         },
                       ),
