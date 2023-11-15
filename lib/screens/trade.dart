@@ -1,23 +1,45 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart';
 
-
-const outletsList = ["Naveen Tea Stall", "Swad Enterprises", "Quench", "Anna's Cafe"];
 
 class TradeScreen extends StatefulWidget {
-  const TradeScreen({super.key});
-  static const String routeName = '/trade';
+  final String itemName;
+  const TradeScreen({super.key, required this.itemName});
 
   @override
   State<TradeScreen> createState() => _TradeScreenState();
 }
 
 class _TradeScreenState extends State<TradeScreen> {
+
+  late List<dynamic> outletsList = [];
+
+    void fetchStores() async {
+      String url = 'http://10.0.2.2:8000/raw_materials/${widget.itemName}/stores?exclude=1';
+      get(Uri.parse(url)).then((Response response) {
+        if (response.statusCode == 200) {
+          setState(() {
+            outletsList = jsonDecode(response.body);
+          });
+        }
+        else {
+          print('Request failed with status: ${response.statusCode}.');
+        }
+      });
+    }
+
+    // @app.get("/raw_materials/{raw_material_name}/stores")
+    @override
+    void initState() {
+      super.initState();
+      fetchStores();
+    }
+
   @override
   Widget build(BuildContext context) {
-    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
-    final String itemName = arguments['itemName'];
-
     return Scaffold(
       body: Column(
         children: [
@@ -43,7 +65,7 @@ class _TradeScreenState extends State<TradeScreen> {
                 Row(
                   children: [
                     Text(
-                      itemName,
+                      widget.itemName,
                       style: GoogleFonts.spaceGrotesk(
                           color: Colors.black, fontSize: 32, fontWeight: FontWeight.bold),
                     ),
@@ -60,7 +82,7 @@ class _TradeScreenState extends State<TradeScreen> {
                   itemCount: outletsList.length,
                   itemBuilder: (BuildContext context, int index) {
                     return ListTile(
-                      title: Text(outletsList[index]),
+                      title: Text(outletsList[index]['name']),
                       trailing: ElevatedButton(
                         onPressed: () {
                           // open a bottom sheet with the outlet details
@@ -71,11 +93,9 @@ class _TradeScreenState extends State<TradeScreen> {
                                 height: 200,
                                 child: Column(
                                   children: [
-                                    Text(outletsList[index]),
-                                    Text("Address"),
-                                    Text("Phone Number"),
-                                    Text("Email"),
-                                    Text("Website"),
+                                    Text(outletsList[index]['name']),
+                                    Text(outletsList[index]['address']),
+                                    Text(outletsList[index]['contact'].toString()),
                                     ElevatedButton(
                                       onPressed: () {
                                         // open a bottom sheet with the outlet details
@@ -86,7 +106,7 @@ class _TradeScreenState extends State<TradeScreen> {
                                               height: 200,
                                               child: Column(
                                                 children: [
-                                                  Text("Buy from " + outletsList[index]),
+                                                  Text("Buy from " + outletsList[index]['name']),
                                                   // row with a rs. symbol and numberfield
                                                   Row(
                                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -111,7 +131,7 @@ class _TradeScreenState extends State<TradeScreen> {
                                                       // show snackbar
                                                       ScaffoldMessenger.of(context).showSnackBar(
                                                         SnackBar(
-                                                          content: Text('Offer sent to ' + outletsList[index]),
+                                                          content: Text('Offer sent to ' + outletsList[index]['name']),
                                                           duration: Duration(seconds: 3),
                                                         ),
                                                       );

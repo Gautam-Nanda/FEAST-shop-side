@@ -24,7 +24,6 @@ class MyApp extends StatelessWidget {
       home: LoginScreen(),
       routes: {
         HomeScreen.routeName: (context) => const HomeScreen(),
-        TradeScreen.routeName: (context) => const TradeScreen(),
         AllOrders.routeName: (context) => const AllOrders(),
       },
     );

@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart';
+import 'package:storeapp/screens/trade.dart';
 
 class Inventory extends StatefulWidget {
   @override
@@ -7,35 +11,72 @@ class Inventory extends StatefulWidget {
 }
 
 class _InventoryState extends State<Inventory> {
-  Map<String, List<List<dynamic>>> items = {};
-  List<List<dynamic>> raw = [];
+  Map<dynamic, dynamic> items = {};
+  List<dynamic> raw = [];
 
   // init state
   @override
   void initState() {
     super.initState();
-    items ={
-      "Rolls":[
-        ["Chicken Roll", true],
-        ["Mutton Roll", true],
-        ["Fish Roll", false],
-        ["Egg Roll", true],
-      ],
-      "Burgers":[
-        ["Chicken Burger", true],
-        ["Mutton Burger", true],
-        ["Fish Burger", false],
-        ["Egg Burger", true],
-      ],
-      "Sandwiches":[
-        ["Chicken Sandwich", true],
-        ["Mutton Sandwich", true],
-        ["Fish Sandwich", false],
-        ["Egg Sandwich", true],
-      ],
-    };
+    const String url = 'http://10.0.2.2:8000/store/1/items';
+    get(Uri.parse(url)).then((Response response) {
+      if (response.statusCode == 200) {
+        setState(() {
+          items = jsonDecode(response.body);
+        });
+      }
+      else {
+        print('Request failed with status: ${response.statusCode}.');
+      }
+    });
 
-    raw = [["Onions", true], ["Tomatoes", true], ["Lettuce", false], ["Buns", true], ["Chicken", true], ["Mutton", true], ["Fish", false], ["Eggs", true],];
+    const String rawUrl = 'http://10.0.2.2:8000/store/1/raw_materials';
+    get(Uri.parse(rawUrl)).then((Response response) {
+      if (response.statusCode == 200) {
+        setState(() {
+          raw = jsonDecode(response.body);
+        });
+      }
+      else {
+        print('Request failed with status: ${response.statusCode}.');
+      }
+    });
+  }
+
+  void toggleAvailability(int id, bool value) {
+    String url = 'http://10.0.2.2:8000/items/$id/toggle-availability?availabe=$value';
+    get(Uri.parse(url)).then((Response response) {
+      if (response.statusCode == 200) {
+        // show snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Availability changed'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+      else {
+        print('Request failed with status: ${response.statusCode}.');
+      }
+    });
+  }
+
+  void toggleRawMaterialAvailability(int id, bool value) {
+    String url = 'http://10.0.2.2:8000/raw_materials/$id/store/1/toggle-availability?available=$value';
+    get(Uri.parse(url)).then((Response response) {
+      if (response.statusCode == 200) {
+        // show snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Availability changed'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+      else {
+        print('Request failed with status: ${response.statusCode}.');
+      }
+    });
   }
 
   void changeAvailability(String name, bool value, bool isRawMaterial) {
@@ -44,6 +85,7 @@ class _InventoryState extends State<Inventory> {
         for (var item in items.entries) {
           for (var i in item.value) {
             if (i[0] == name) {
+              toggleAvailability(i[2], value);
               i[1] = value;
               return;
             }
@@ -61,6 +103,7 @@ class _InventoryState extends State<Inventory> {
       setState(() {
         for (var i in raw) {
           if (i[0] == name) {
+            toggleRawMaterialAvailability(i[2], value);
             i[1] = value;
             return;
           }
@@ -120,7 +163,7 @@ class _InventoryState extends State<Inventory> {
 
 class InventorySection extends StatelessWidget {
   final String title;
-  final List<List<dynamic>> items;
+  final List<dynamic> items;
   final Function changeAvailability;
   const InventorySection({super.key, required this.title, required this.items, required this.changeAvailability});
 
@@ -164,9 +207,11 @@ class InventoryItem extends StatelessWidget {
         if (isRawMaterial)
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, '/trade', arguments: {
-                  'itemName': name
-                }
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TradeScreen(itemName: name),
+                )
               );
             },
             icon: Icon(Icons.arrow_circle_right_outlined, color: Colors.orange),
